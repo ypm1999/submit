@@ -51,7 +51,7 @@ class SingOp(Op):
 		a = input_vals[0]
 		n = 1
 		for i in a.shape:
-			n  *= i
+			n *= i
 		result = np.ndarray(shape = a.shape, dtype = float32)
 
 		sign_c(a, result, n)
@@ -122,6 +122,7 @@ class Grad_Of_conv2dOp(Op):
 		new_node.input = [img, filter, grad]
 		new_node.strides = strides
 		new_node.padding = padding
+		new_node.name = "grad_of_conv2d(%s,%s,%s)" % (img.name, filter.name, grad.name)
 		return new_node
 
 	def compute(self, node, input_vals):
@@ -147,6 +148,7 @@ class Grad_toW_Of_conv2dOp():
 		new_node.input = [img, filter, grad]
 		new_node.strides = strides
 		new_node.padding = padding
+		new_node.name = "grad_toW_of_conv2d(%s,%s,%s)" % (img.name, filter.name, grad.name)
 		return new_node
 
 	def compute(self, node, input_vals):
@@ -198,6 +200,7 @@ class Grad_Of_MaxpoolOp(Op):
 		new_node.op = self
 		new_node.input = [node1, node2, node3]
 		new_node.ksize = ksize
+		new_node.name = "grad_of_maxpool(%s,%s,%s)" % (node1.name, node2.name, node3.name)
 		return new_node
 
 	def compute(self, node, input_vals):

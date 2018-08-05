@@ -1,7 +1,7 @@
 import os
 import sys
 
-python_cmd = "python"
+python_cmd = "python3"
 testcase_dir = "testcase"
 tests = [
     ["adder",       "1_adder.py"],
@@ -35,6 +35,7 @@ def main(model_name):
     print("Pass all!")
 
 if __name__ == "__main__":
+    # os.system("cd tensorlow/CNN_c && make")
     if (len(sys.argv) != 2):
         print("Usage: python run_test.py name_of_your_model")
         exit(0)

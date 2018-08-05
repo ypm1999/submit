@@ -6,7 +6,6 @@ from tensorlow.topo import *
 
 
 class Node(object):
-
 	def __init__(self):
 		self.input = []
 		self.value = None
@@ -59,6 +58,7 @@ class Node(object):
 	def run(self, feed_dict = None):
 		from tensorlow.Session import default_session
 		return default_session.run(self, feed_dict)
+
 
 	eval = run
 
@@ -403,7 +403,7 @@ class Reduce_MeanOp(Op):
 		new_node = Node()
 		new_node.op = self
 		new_node.input = [input_tensor]
-		new_node.name = name
+		new_node.name = "reduce_mean(%s)" % input_tensor.name
 		if reduction_indices:
 			new_node.axis = reduction_indices[0]
 		else:
@@ -459,7 +459,7 @@ class Reduce_SumOp(Op):
 		new_node = Node()
 		new_node.op = self
 		new_node.input = [input_tensor]
-		new_node.name = name
+		new_node.name = "reduce_sum(%s)" % input_tensor.name
 		if reduction_indices:
 			new_node.axis = reduction_indices[0]
 		else:

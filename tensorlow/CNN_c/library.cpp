@@ -216,6 +216,7 @@ void backup_conv2d_filter(float *_img, float *_flt, float *_result,
         }
         matmul(image, filter, result, (uint)(new_n * new_m) * fin, fn * fm, fout, 1);
     }
+	delete[] image;
 }
 
 void do_max_pool(uint l, uint r){
