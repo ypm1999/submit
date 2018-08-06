@@ -158,7 +158,7 @@ class Grad_toW_Of_conv2dOp():
 		grad  = input_vals[2]
 		num, n, m, ins = img.shape
 		fn, fm, fin, fout = flt.shape
-		result = np.zeros(shape = (fn, fm, fin, fout), dtype = np.float32)
+		result = np.ndarray(shape = (fn, fm, fin, fout), dtype = np.float32)
 		backup_conv2d_filter_c(img, grad, result, num, n, m, fn, fm, fin, fout, node.padding == "SAME")
 		return result
 
@@ -207,7 +207,7 @@ class Grad_Of_MaxpoolOp(Op):
 		assert len(input_vals) == 3, "\033[1;31mNode number not suit at max_pool's gradient!\033[0m"
 		grad = input_vals[2]
 		num, n, m, ins = input_vals[1].shape
-		result = np.zeros(shape = (num, n, m, ins), dtype = float32)
+		result = np.ndarray(shape = (num, n, m, ins), dtype = float32)
 
 		backup_max_pool_c(node.input[0].maxpos, grad, result, num, n, m, node.ksize[1], node.ksize[2], ins)
 		return result
