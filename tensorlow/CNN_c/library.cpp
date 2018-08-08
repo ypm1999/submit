@@ -71,8 +71,8 @@ void trans_in_out(float* &filter, uint n, uint m, uint fin, uint fout){
     filter = result;
 }
 
-const uint memory_size = (4 * 28 * 28 * 5 * 5 * 32);
-float image[memory_size];
+const uint memory_size = (1 * 28 * 28 * 5 * 5 * 32);
+float* image = (float*)malloc(memory_size * sizeof(float));
 
 void set_zero(uint num, const int &new_n, const int &new_m,
               const int &u, const int &d, const int &l, const int &r, const int &last){

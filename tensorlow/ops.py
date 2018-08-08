@@ -162,7 +162,7 @@ class AssignOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == len(node.input), "\033[1;31mNode number not suit!\033[0m"
+		# assert len(input_vals) == len(node.input), "\033[1;31mNode number not suit!\033[0m"
 		ref = node.ref
 		if len(node.input) == 1:
 			ref.value = input_vals[0]
@@ -185,7 +185,7 @@ class AddOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at add!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at add!\033[0m"
 		return input_vals[0] + input_vals[1]
 
 	def gradient(self, node, grad):
@@ -201,7 +201,7 @@ class SubOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at sub!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at sub!\033[0m"
 		return input_vals[0] - input_vals[1]
 
 	def gradient(self, node, grad):
@@ -217,7 +217,7 @@ class NegOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at neg!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at neg!\033[0m"
 		return -input_vals[0]
 
 	def gradient(self, node, grad):
@@ -233,7 +233,7 @@ class MulOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at mul!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at mul!\033[0m"
 		return input_vals[0] * input_vals[1]
 
 	def gradient(self, node, grad):
@@ -251,7 +251,7 @@ class DivOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit!\033[0m"
 		return input_vals[0] / input_vals[1]
 
 	def gradient(self, node, grad):
@@ -272,7 +272,7 @@ class MatmulOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at matmul!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at matmul!\033[0m"
 		a, b = input_vals
 		na, ma = a.shape
 		nb, mb = b.shape
@@ -304,7 +304,7 @@ class ExpOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at exp!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at exp!\033[0m"
 		return np.exp(input_vals[0])
 
 	def gradient(self, node, grad):
@@ -320,7 +320,7 @@ class LogOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at log!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at log!\033[0m"
 		return np.log(input_vals[0])
 
 	def gradient(self, node, grad):
@@ -373,7 +373,7 @@ class Reduce_Shape_ToOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at reduce_shape_to!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at reduce_shape_to!\033[0m"
 		if not isinstance(input_vals[1], np.ndarray):
 			return np.sum(input_vals[0])
 		shape = list(np.shape(input_vals[0]))
@@ -416,7 +416,7 @@ class Reduce_MeanOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at reduce_mean!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at reduce_mean!\033[0m"
 		if node.keepdims:
 			return np.mean(input_vals[0], axis = node.axis, keepdims = node.keepdims)
 		else:
@@ -437,7 +437,7 @@ class Expand_MeanOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at expand_mean!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at expand_mean!\033[0m"
 		if node.axis and not node.keepdims:
 			input_vals[0] = np.expand_dims(input_vals[0], node.axis)
 		new_shape = np.shape(input_vals[1])
@@ -472,7 +472,7 @@ class Reduce_SumOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at reduce_sum!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at reduce_sum!\033[0m"
 		if node.keepdims:
 			return np.sum(input_vals[0], axis = node.axis, keepdims = node.keepdims)
 		else:
@@ -493,7 +493,7 @@ class Expand_SumOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at expand_sum!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at expand_sum!\033[0m"
 		if node.axis and not node.keepdims:
 			input_vals[0] = np.expand_dims(input_vals[0], node.axis)
 		return np.array(np.broadcast_to(input_vals[0], np.shape(input_vals[1])))
@@ -512,7 +512,7 @@ class EqualOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at equal!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at equal!\033[0m"
 		return np.equal(input_vals[0], input_vals[1])
 
 	def gradient(self, node, grad):
@@ -533,7 +533,7 @@ class ArgmaxOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at argmax!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at argmax!\033[0m"
 		return np.argmax(input_vals[0], axis = node.axis)
 
 	def gradient(self, node, grad):
@@ -551,7 +551,7 @@ class ReshapeOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at reshape!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at reshape!\033[0m"
 		return np.reshape(input_vals[0], node.shape)
 
 	def gradient(self, node, grad):
@@ -568,7 +568,7 @@ class Reshape_ToOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at reshape_to!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at reshape_to!\033[0m"
 		return np.reshape(input_vals[0], np.shape(input_vals[1]))
 
 	def gradient(self, node, grad):
@@ -592,7 +592,7 @@ class CastOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at cast!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at cast!\033[0m"
 		return node.dtype(input_vals[0])
 
 	def gradient(self, node, grad):

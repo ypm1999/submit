@@ -30,6 +30,7 @@ class GradientDescentOptimizer(Op):
 		assert False, "\033[1;31mSGD don't have gradient!\033[0m"
 
 
+import math
 class AdamOptimizer(Op):
 	#TODO
 	def __init__(self, learning_rate = 0.001, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-08):
@@ -56,10 +57,11 @@ class AdamOptimizer(Op):
 		new_node.name = "Adma(%s)" % loss.name
 		return new_node
 
+	# @profile
 	def compute(self, node, input_vals):
 		grad = input_vals
-		node.t = node.t + 1
-		tmp = node.rate * np.sqrt((1 - np.power(node.b2, node.t)) / (1 - np.power(node.b1, node.t)))
+		node.t += 1
+		tmp = node.rate * math.sqrt((1 - math.pow(node.b2, node.t)) / (1 - math.pow(node.b1, node.t)))
 		for i, it in enumerate(node.var_list):
 			node.m[i] = node.m[i] * node.b1 + (1 - node.b1) * grad[i]
 			node.v[i] = node.v[i] * node.b2 + (1 - node.b2) * np.square(grad[i])

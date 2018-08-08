@@ -20,11 +20,13 @@ class Session:
 			print(exc_val)
 			print(exc_tb)
 
+
 	@staticmethod
+	# @profile
 	def _run(output, node_value):
 		topo_order = find_topo_sort(output)
 		for node in topo_order:
-			if isinstance(node.op, PlaceHolderOp):
+			if node.op == placeholder:
 				continue
 			val = []
 			for inputs in node.input:
@@ -32,15 +34,17 @@ class Session:
 			node_value[node] = node.op.compute(node, val)
 		return [node_value[node] for node in output]
 
+	# @profile
 	def run(self, fetches, feed_dict = None):
 
 		# value_list = placeholder.value_list.copy()
 		value_list = placeholder.value_list
+
 		if feed_dict:
 			for i, j in feed_dict.items():
 				if not i in placeholder.placeholder_list:
 					raise NameError
-				if isinstance(j, (list, np.ndarray)):
+				if type(j) == list:
 					value_list[i] = np.array(j, dtype = i.dtype)
 				else:
 					value_list[i] = i.dtype(j)

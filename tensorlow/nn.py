@@ -25,7 +25,6 @@ class Softmax_Cross_Entropy_With_LogitsOp(Op):
 		new_node.name = "Softmax_Cross_Entropy_With_Logits(%s,%s)" % (labels.name, logits.name)
 		return new_node
 
-
 	def compute(self, node, input_vals):
 		label = input_vals[0]
 		logit = input_vals[1]
@@ -46,15 +45,12 @@ class SingOp(Op):
 		new_node.name = "sing(%s)" % node1.name
 		return new_node
 
+	# @profile
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at sign!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at sign!\033[0m"
 		a = input_vals[0]
-		n = 1
-		for i in a.shape:
-			n *= i
 		result = np.ndarray(shape = a.shape, dtype = float32)
-
-		sign_c(a, result, n)
+		sign_c(a, result, a.size)
 		return result
 
 	def gradient(self, node, grad):
@@ -69,16 +65,12 @@ class ReluOp(Op):
 		new_node.name = "relu(%s)" % features.name
 		return new_node
 
+	# @profile
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at relu!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at relu!\033[0m"
 		a = input_vals[0]
-		shape = a.shape
-		n = 1
-		for i in shape:
-			n *= i
-		result = np.ndarray(shape = shape, dtype = float32)
-
-		relu_c(a, result, n)
+		result = np.ndarray(shape = a.shape, dtype = float32)
+		relu_c(a, result, a.size)
 		return result
 
 	def gradient(self, node, grad):
@@ -95,8 +87,9 @@ class Conv2dOp(Op):
 		new_node.name = "conv2d(%s,%s)" % (image.name, filter.name)
 		return new_node
 
+	# @profile
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at nn.conv2d!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at nn.conv2d!\033[0m"
 		img = input_vals[0]
 		flt = input_vals[1]
 		num, n, m, ins = img.shape
@@ -120,13 +113,14 @@ class Grad_Of_conv2dOp(Op):
 		new_node = Node()
 		new_node.op = self
 		new_node.input = [img, filter, grad]
-		new_node.strides = strides
+		new_node.strides = tuple(strides)
 		new_node.padding = padding
 		new_node.name = "grad_of_conv2d(%s,%s,%s)" % (img.name, filter.name, grad.name)
 		return new_node
 
+	# @profile
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 3, "\033[1;31mNode number not suit at nn.conv2d!\033[0m"
+		# assert len(input_vals) == 3, "\033[1;31mNode number not suit at nn.conv2d!\033[0m"
 		img = input_vals[0]
 		flt = input_vals[1]
 		grad = input_vals[2]
@@ -146,13 +140,14 @@ class Grad_toW_Of_conv2dOp():
 		new_node = Node()
 		new_node.op = self
 		new_node.input = [img, filter, grad]
-		new_node.strides = strides
+		new_node.strides =  strides
 		new_node.padding = padding
 		new_node.name = "grad_toW_of_conv2d(%s,%s,%s)" % (img.name, filter.name, grad.name)
 		return new_node
 
+	# @profile
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 3, "\033[1;31mNode number not suit at nn.conv2d!\033[0m"
+		# assert len(input_vals) == 3, "\033[1;31mNode number not suit at nn.conv2d!\033[0m"
 		img = input_vals[0]
 		flt = input_vals[1]
 		grad  = input_vals[2]
@@ -180,12 +175,14 @@ class MaxpoolOp(Op):
 		new_node.name = "maxpool(%s)" % value.name
 		return new_node
 
+	# @profile
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 1, "\033[1;31mNode number not suit at nn.max_pool!\033[0m"
+		# assert len(input_vals) == 1, "\033[1;31mNode number not suit at nn.max_pool!\033[0m"
 		img = input_vals[0]
-		num, n, m, ins = np.shape(img)
+		num, n, m, ins = img.shape
 		result = np.ndarray(shape = (num, n // node.ksize[1], m // node.ksize[2], ins), dtype = float32)
-		node.maxpos = np.ndarray(shape = result.shape, dtype = int32)
+		if(not isinstance(node.maxpos, np.ndarray) or node.maxpos.shape != result.shape):
+			node.maxpos = np.ndarray(shape = result.shape, dtype = int32)
 
 		max_pool_c(img, result, node.maxpos, num, n, m, node.ksize[1], node.ksize[2], ins)
 		return result
@@ -203,8 +200,9 @@ class Grad_Of_MaxpoolOp(Op):
 		new_node.name = "grad_of_maxpool(%s,%s,%s)" % (node1.name, node2.name, node3.name)
 		return new_node
 
+	# @profile
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 3, "\033[1;31mNode number not suit at max_pool's gradient!\033[0m"
+		# assert len(input_vals) == 3, "\033[1;31mNode number not suit at max_pool's gradient!\033[0m"
 		grad = input_vals[2]
 		num, n, m, ins = input_vals[1].shape
 		result = np.ndarray(shape = (num, n, m, ins), dtype = float32)
@@ -226,10 +224,10 @@ class DropoutOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at nn.max_pool!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at nn.max_pool!\033[0m"
 		x = input_vals[0]
 		keep_prob = input_vals[1]
-		shape = np.shape(x)
+		shape = x.shape
 		node.data = np.random.rand(*shape)
 		node.data = node.data < keep_prob
 		return x * node.data
@@ -247,7 +245,7 @@ class Grad_Of_DropoutOp(Op):
 		return new_node
 
 	def compute(self, node, input_vals):
-		assert len(input_vals) == 2, "\033[1;31mNode number not suit at nn.max_pool!\033[0m"
+		# assert len(input_vals) == 2, "\033[1;31mNode number not suit at nn.max_pool!\033[0m"
 		return input_vals[1] * node.input[0].data
 
 	def gradient(self, node, grad):
