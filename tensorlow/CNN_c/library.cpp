@@ -7,7 +7,7 @@
 using std::cout;
 using std::endl;
 typedef unsigned int uint;
-const int thread_num = 8;
+const int thread_num = 4;
 
 
 uint num, n, m, fn, fm, fin, fout, nn, mm, sn, sm, new_n, new_m;
@@ -31,14 +31,14 @@ inline void matmul(float* a, float* b, float* c, uint n, uint k, uint m, float b
 inline uint imgpos(const uint &i, const uint &j = 0, const uint &p = 0, const uint &q = 0){
     return q + fin * (p + m * (j + i * n));
 }
-
-inline uint fltpos(const uint &i, const uint &j = 0, const uint &p = 0, const uint &q = 0){
-    return q + fout * (p + fin * (j + i * fm));
-}
-
-inline uint respos(const uint &i, const uint &j = 0, const uint &p = 0, const uint &q = 0){
-    return q + fout * (p + m * (j + i * n));
-}
+//
+//inline uint fltpos(const uint &i, const uint &j = 0, const uint &p = 0, const uint &q = 0){
+//    return q + fout * (p + fin * (j + i * fm));
+//}
+//
+//inline uint respos(const uint &i, const uint &j = 0, const uint &p = 0, const uint &q = 0){
+//    return q + fout * (p + m * (j + i * n));
+//}
 
 
 inline uint polpos(const uint &i, const uint &j = 0, const uint &p = 0, const uint &q = 0){
@@ -71,60 +71,55 @@ void trans_in_out(float* &filter, uint n, uint m, uint fin, uint fout){
     filter = result;
 }
 
-const uint memory_size = (1 * 28 * 28 * 5 * 5 * 32);
-float* image = (float*)malloc(memory_size * sizeof(float));
+uint memory_size = 0;
+float* image = nullptr;
 
-void set_zero(uint num, const int &new_n, const int &new_m,
-              const int &u, const int &d, const int &l, const int &r, const int &last){
-    int row = fn * fm * last;
-    for(uint now = 0, _size = sizeof(float) * last; now < num; now++){
-        float* mat = image + (now * new_n * new_m * row);
-        //clo2im
-        for (int i = u; i < d; i++){
-            for (int j = l; j < r; j++){
-                int td = i + fn, tr = j + fm;
-                if(i >= 0 && j >= 0 && td < n && tr < m)
-                    continue;
-                float* tmp_now = mat + row * ((j - l) + (i - u) * m);
-                for (int x = i; x < td; x++){
-                    for (int y = j; y < tr; y++, tmp_now += last){
-                        if(x < 0 || y < 0 || x >= n || y >= m)
-                            memset(tmp_now, 0, _size);
-                    }
+void set_zero(const int &new_n, const int &new_m, const int &u, const int &d, const int &l, const int &r, const int &last){
+    uint row = fn * fm * last, _size = sizeof(float) * last;
+    for (int i = u; i < d; i++){
+        for (int j = l; j < r; j++){
+            int td = i + fn, tr = j + fm;
+            if(i >= 0 && j >= 0 && td < n && tr < m)
+                continue;
+            float* tmp_now = image + row * ((j - l) + (i - u) * m);
+            for (int x = i; x < td; x++){
+                for (int y = j; y < tr; y++, tmp_now += last){
+                    if(x < 0 || y < 0 || x >= n || y >= m)
+                        memset(tmp_now, 0, _size);
                 }
             }
         }
     }
 }
-
-void run_conv2d(uint L, uint R, const int &new_n, const int &new_m, const int &u, const int &d,
-                const int &l, const int &r, const uint &last, const uint &out){
-    int row = fn * fm * last;
-    for(uint now = L, _size = sizeof(float) * last; now < R; now++){
-        float* img_now = img + imgpos(now);
-        float* mat = image + ((now - L) * new_n * new_m * row);
-        //clo2im
-        for (int i = u; i < d; i++){
-            for (int j = l; j < r; j++){
-                float* tmp_now = mat + row * ((j - l) + (i - u) * m);
-                int td = i + fn, ll = std::max(j, 0), rr = std::min(j + fm, m);
-                uint tmp_add = (ll - j) * last, len = _size * (rr - ll);
-                for (int x = i; x < td; x++, tmp_now += last * fm){
-                    if(x < 0 || x >= n)
-                        continue;
-                    memcpy(tmp_now + tmp_add, img_now + (x * m + ll) * last, len);
-                }
-            }
-        }
-    }
-    float* res = result + (L * new_n * new_m * out);
-    matmul(image, flt, res, (uint)((R - L) * new_n * new_m), fn * fm * last, out);
-}
+//
+//void run_conv2d(uint L, uint R, const int &new_n, const int &new_m, const int &u, const int &d,
+//                const int &l, const int &r, const uint &last, const uint &out){
+//    int row = fn * fm * last;
+//    for(uint now = L, _size = sizeof(float) * last; now < R; now++){
+//        float* img_now = img + imgpos(now);
+//        float* mat = image + ((now - L) * new_n * new_m * row);
+//        //clo2im
+//        for (int i = u; i < d; i++){
+//            for (int j = l; j < r; j++){
+//                float* tmp_now = mat + row * ((j - l) + (i - u) * m);
+//                int td = i + fn, ll = std::max(j, 0), rr = std::min(j + fm, m);
+//                uint tmp_add = (ll - j) * last, len = _size * (rr - ll);
+//                for (int x = i; x < td; x++, tmp_now += last * fm){
+//                    if(x < 0 || x >= n)
+//                        continue;
+//                    memcpy(tmp_now + tmp_add, img_now + (x * m + ll) * last, len);
+//                }
+//            }
+//        }
+//    }
+//    float* res = result + (L * new_n * new_m * out);
+//    matmul(image, flt, res, (uint)((R - L) * new_n * new_m), fn * fm * last, out);
+//}
 
 
 extern "C"
 void conv2d(float *_img, float *_flt, float *_result,
-          int _num, int _n, int _m, int _fn, int _fm, int _fin, int _fout, bool same) {
+            int _num, int _n, int _m, int _fn, int _fm, int _fin, int _fout, bool same) {
     img = _img;
     flt = _flt;
     result = _result;
@@ -141,15 +136,35 @@ void conv2d(float *_img, float *_flt, float *_result,
     d -= _fn - 1;
     r -= _fm - 1;
     int new_n = d - u, new_m = r - l;
-    uint batch_size = memory_size / (new_n * new_m * fn * fm * fin), now = 0;
-    set_zero(batch_size, new_n, new_m, l, r, u, d, fin);
-    while(now < num){
-        uint nex =  now + batch_size;
-        if(nex > num)
-            nex = num;
-        run_conv2d(now, nex, new_n, new_m, l, r, u, d, fin, fout);
-        now = nex;
+
+    uint img_size = new_n * new_m * fn * fm * fin;
+    if(memory_size < img_size){
+        free(image);
+        image = (float*)malloc(img_size * sizeof(float));
+        memory_size = img_size;
     }
+    set_zero(new_n, new_m, l, r, u, d, fin);
+
+    int row = fn * fm * fin;
+    for(uint now = 0, _size = sizeof(float) * fin; now < num; now++){
+        float* img_now = img + imgpos(now);
+        //clo2im
+        for (int i = u; i < d; i++){
+            for (int j = l; j < r; j++){
+                float* tmp_now = image + row * ((j - l) + (i - u) * m);
+                int td = i + fn, ll = std::max(j, 0), rr = std::min(j + fm, m);
+                uint tmp_add = (ll - j) * fin, len = _size * (rr - ll);
+                for (int x = i; x < td; x++, tmp_now += fin * fm){
+                    if(x < 0 || x >= n)
+                        continue;
+                    memcpy(tmp_now + tmp_add, img_now + (x * m + ll) * fin, len);
+                }
+            }
+        }
+        float* res = result + (now * new_n * new_m * fout);
+        matmul(image, flt, res, (uint)(new_n * new_m), fn * fm * fin, fout);
+    }
+
 }
 
 
@@ -178,15 +193,34 @@ void backup_conv2d_image(float *_img, float *_flt, float *_result,
     r -= fm - 1;
     int new_n = d - u, new_m = r - l;
 
-    uint batch_size = memory_size / (new_n * new_m * fn * fm * fout), now = 0;
-    set_zero(batch_size, new_n, new_m, l, r, u, d, fout);
-    while(now < num){
-        uint nex =  now + batch_size;
-        if(nex > num)
-            nex = num;
-        run_conv2d(now, nex, new_n, new_m, l, r, u, d, fout, fin);
-        now = nex;
+    uint img_size = new_n * new_m * fn * fm * fout;
+    if(memory_size < img_size){
+        free(image);
+        image = (float*)malloc(img_size * 2 * sizeof(float));
+        memory_size = img_size * 2;
     }
+    set_zero(new_n, new_m, l, r, u, d, fout);
+
+    int row = fn * fm * fout;
+    for(uint now = 0, _size = sizeof(float) * fout; now < num; now++){
+        float* img_now = img + imgpos(now);
+        //clo2im
+        for (int i = u; i < d; i++){
+            for (int j = l; j < r; j++){
+                float* tmp_now = image + row * ((j - l) + (i - u) * m);
+                int td = i + fn, ll = std::max(j, 0), rr = std::min(j + fm, m);
+                uint tmp_add = (ll - j) * fout, len = _size * (rr - ll);
+                for (int x = i; x < td; x++, tmp_now += fout * fm){
+                    if(x < 0 || x >= n)
+                        continue;
+                    memcpy(tmp_now + tmp_add, img_now + (x * m + ll) * fout, len);
+                }
+            }
+        }
+        float* res = result + (now * new_n * new_m * fin);
+        matmul(image, flt, res, (uint)(new_n * new_m), fn * fm * fout, fin);
+    }
+
     free(flt);
 }
 
@@ -243,6 +277,7 @@ void backup_conv2d_filter(float *_img, float *_flt, float *_result,
         matmul(image, filter, result, (uint)(new_n * new_m) * fin, fn * fm, fout, (float)(now > 0));
     }
 }
+
 void do_max_pool(uint l, uint r){
     for(uint now = l; now < r; now++){
         for(uint i = 0, idi = 0, tmp = 0; i < n; idi = ++i / sn){
@@ -250,10 +285,10 @@ void do_max_pool(uint l, uint r){
                 float *image = img + imgpos(now, i, j);
                 float *res = result + polpos(now, idi, idj);
                 int *pos = maxpos + polpos(now, idi, idj);
-                for(uint k = 0; k < fout; k++, res++, image++){
+                for(float *end = res + fout; res != end;  res++, image++, pos++){
                     if(*image > *res){
                         *res = *image;
-                        pos[k] = tmp;
+                        *pos = tmp;
                     }
                 }
             }
@@ -278,11 +313,12 @@ void max_pool(float *_img, float *_result, int *_maxpos,
     mm = m / _sm;
     memset(result, 254, num * nn * mm * fout * sizeof(float));
     int k = num / thread_num, rest = num % thread_num;
-    int nums[8] = {k, k, k, k, k, k, k, k};
+    int nums[4] = {k, k, k, k};
+
     for(int i = 0; i < rest; i++)
         nums[i]++;
 
-    std::thread th[8];
+    std::thread th[4];
     th[0] = std::thread(do_max_pool, 0, nums[0]);
     for(int i = 1; i < thread_num; i++){
         nums[i] += nums[i - 1];
@@ -300,10 +336,7 @@ void do_backup_max_pool(uint l, uint r){
                 float *gra = grad + polpos(now, idi, idj);
                 int *pos = maxpos + polpos(now, idi, idj);
                 for(uint k = 0; k < fout; k++, pos++, res++, gra++){
-                    if(tmp == *pos)
-                        *res = *gra;
-                    else
-                        *res = 0;
+                    *res = ((tmp == *pos) ? *gra : 0);
                 }
             }
         }
@@ -312,7 +345,7 @@ void do_backup_max_pool(uint l, uint r){
 
 extern "C"
 void backup_max_pool(int *_maxpos, float *_grad, float *_result,
-              int _num, int _n, int _m, int _sn, int _sm, int _fout){
+                     int _num, int _n, int _m, int _sn, int _sm, int _fout){
     maxpos = _maxpos;
     grad = _grad;
     result = _result;
@@ -325,12 +358,12 @@ void backup_max_pool(int *_maxpos, float *_grad, float *_result,
     sn = (uint)_sn;
     sm = (uint)_sm;
     int k = num / thread_num, rest = num % thread_num;
-    int nums[8] = {k, k, k, k, k, k, k, k};
+    int nums[4] = {k, k, k, k};
 
     for(int i = 0; i < rest; i++)
         nums[i]++;
 
-    std::thread th[8];
+    std::thread th[4];
     th[0] = std::thread(do_backup_max_pool, 0, nums[0]);
     for(int i = 1; i < thread_num; i++){
         nums[i] += nums[i - 1];
@@ -366,12 +399,12 @@ extern "C"
 void sgn(float* a, float* result, int n){
     if(n > 2000000){
         int k = n / thread_num, rest = n % thread_num;
-        int nums[8] = {k, k, k, k, k, k, k, k};
+        int nums[4] = {k, k, k, k};
 
         for(int i = 0; i < rest; i++)
             nums[i]++;
 
-        std::thread th[8];
+        std::thread th[4];
         th[0] = std::thread(run_sgn, a, result, nums[0]);
         for(int i = 1; i < thread_num; i++){
             a += nums[i - 1];
@@ -399,12 +432,12 @@ extern "C"
 void relu(float* a, float* result, int n){
     if(n > 2000000){
         int k = n / thread_num, rest = n % thread_num;
-        int nums[8] = {k, k, k, k, k, k, k, k};
+        int nums[4] = {k, k, k, k};
 
         for(int i = 0; i < rest; i++)
             nums[i]++;
 
-        std::thread th[8];
+        std::thread th[4];
         th[0] = std::thread(run_relu, a, result, nums[0]);
         for(int i = 1; i < thread_num; i++){
             a += nums[i - 1];

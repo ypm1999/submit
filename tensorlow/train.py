@@ -63,8 +63,10 @@ class AdamOptimizer(Op):
 		node.t += 1
 		tmp = node.rate * math.sqrt((1 - math.pow(node.b2, node.t)) / (1 - math.pow(node.b1, node.t)))
 		for i, it in enumerate(node.var_list):
-			node.m[i] = node.m[i] * node.b1 + (1 - node.b1) * grad[i]
-			node.v[i] = node.v[i] * node.b2 + (1 - node.b2) * np.square(grad[i])
+			node.m[i] = node.m[i] * node.b1
+			node.m[i] += (1 - node.b1) * grad[i]
+			node.v[i] = node.v[i] * node.b2
+			node.v[i] += (1 - node.b2) * np.square(grad[i])
 			placeholder.value_list[it] -= tmp * node.m[i] / (np.sqrt(node.v[i]) + node.eps)
 
 		return None
