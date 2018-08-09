@@ -9,7 +9,8 @@ c_float32 = ctypes.c_float
 c_int32 = ctypes.c_int32
 c_bool = ctypes.c_bool
 
-clib = ctypes.cdll.LoadLibrary("tensorlow/nn_c.so")
+clib = np.ctypeslib.load_library("nn_c", "./tensorlow")
+# clib = ctypes.cdll.LoadLibrary("tensorlow/nn_c.so")
 # clib = ctypes.cdll.LoadLibrary("./nn_c.so")
 max_pool_c = clib.max_pool
 backup_max_pool_c = clib.backup_max_pool
