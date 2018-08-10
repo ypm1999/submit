@@ -1,3 +1,0 @@
-/home/sjtu-ypm/PPCA-tensorflow/tensorlow/CNN_c/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/sjtu-ypm/PPCA-tensorflow/tensorlow/CNN_c/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/sjtu-ypm/PPCA-tensorflow/tensorlow/CNN_c/cmake-build-debug/CMakeFiles/CNN_c.dir
